@@ -16,13 +16,12 @@ int main(int argc, char** argv)
     Mat edges;
     Mat color_iso;
 
-    //VideoCapture vid("test_tape.mp4");
     VideoCapture src(0);
     if(!src.isOpened()) return -1;
 
     Mat frame;
     while(src.read(frame)) {
-        src >> frame;
+        //src >> frame;
         imshow("frame", frame);
 
         cvtColor(frame, edges, COLOR_BGR2GRAY);
