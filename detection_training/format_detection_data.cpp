@@ -17,14 +17,13 @@ int main(int argc, char** argv)
     int kernel_size = 3;
 
     cv::Mat image;
-    int min_w = 100000;
-    int min_h = 100000;
+    cv::Mat resized_image;
     int num_pos = 0;
     int num_neg = 0;
 
     //gets the name of each file and stores it in file_names_pos
     std::vector<cv::String> file_names_pos;
-    cv::glob("pos/*.jpg", file_names_pos, true);
+    cv::glob("pos/*", file_names_pos, true);
 
     std::ofstream pos_list("pos.info");
     for(int i=0; i<file_names_pos.size(); ++i) {
@@ -32,16 +31,12 @@ int main(int argc, char** argv)
         image = cv::imread(file_names_pos[i]);
 
         if(!image.empty()) {
-            if(image.cols < min_w) min_w = image.cols;
-            if(image.rows < min_h) min_h = image.rows;
 
             cv::cvtColor(image, image, cv::COLOR_BGR2GRAY);
-            // cv::blur(image, image, cv::Size(5,5));
-            // cv::Canny(image, image, threshold, threshold*ratio, kernel_size);
 
             //saves formatted image in pos-formatted
             std::string name = "pos-formatted/pos-" + std::to_string(num_pos) + ".jpg";
-            cv::imwrite(name, image);
+            cv::imwrite(name, resized_image);
 
             //write file name to pos-formatted.txt
             pos_list << name << " 1 0 0 " << std::to_string(image.cols) << " " << std::to_string(image.rows) << std::endl;
@@ -52,17 +47,16 @@ int main(int argc, char** argv)
 
     //gets the name of each file and stores it in file_names_neg
     std::vector<cv::String> file_names_neg;
-    cv::glob("neg/*.jpg", file_names_neg, true);
+    cv::glob("neg/*", file_names_neg, true);
 
     std::ofstream neg_list("neg.txt");
     for(int i=0; i<file_names_neg.size(); ++i) {
 
         image = cv::imread(file_names_neg[i]);
 
-        if(!image.empty() && image.cols > min_w && image.rows > min_h) {
+        if(!image.empty()/* && image.cols > min_w && image.rows > min_h*/) {
+
             cv::cvtColor(image, image, cv::COLOR_BGR2GRAY);
-            // cv::blur(image, image, cv::Size(5,5));
-            // cv::Canny(image, image, threshold, threshold*ratio, kernel_size);
 
             //saves formatted image in neg-formatted
             std::string name = "neg-formatted/neg-" + std::to_string(num_neg) + ".jpg";
@@ -80,4 +74,3 @@ int main(int argc, char** argv)
 
 
 //g++ -std=c++11 format_detection_data.cpp -o format_detection_data `pkg-config opencv --cflags --libs`
- 
