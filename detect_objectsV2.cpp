@@ -22,7 +22,7 @@ int main(int argc, char** argv)
     std::vector<point_data> points;
     int radius = 100;
     int wait_time = 20;
-    int reset_time = 80;
+    int reset_time = 120;
 
     cv::VideoCapture src(0);
     if(!src.isOpened()) return -1;
@@ -47,18 +47,17 @@ int main(int argc, char** argv)
             add_point(points, curr_point, radius);
 
             cv::Point best_point = find_point(points);
-            if(best_point.x != 0) cv::circle(frame, best_point, 50, cv::Scalar(255,255,255), 2, 8, 0);
+            if(best_point.x) cv::circle(frame, best_point, 50, cv::Scalar(255,255,255), 2, 8, 0);
         } 
         else std::cout << "-----------------------------------------------" << std::endl;
 
         // Check if reset_time has passed
-        if(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start).count()
-           >= reset_time) {
+        if(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start).count() >= reset_time) {
                remove_point(points);
                start = std::chrono::steady_clock::now();
            }
 
-        print_points(points);
+        if(points.size()) print_points(points);
         cv::imshow("Window", frame);
         cv::waitKey(wait_time);
     }
@@ -80,7 +79,7 @@ cv::Point find_point(std::vector<point_data> points)
             max_index = i;
         }
     }
-    if(max > 3) return points.at(max_index).p;
+    if(max > 1) return points.at(max_index).p;
     return {0,0};
 }
 
@@ -128,8 +127,7 @@ void print_points(std::vector<point_data> points)
 {
     for(int i=0; i<points.size(); i++)
     {
-        std::cout << "point: " << points.at(i).p.x << "," << points.at(i).p.y
-                  << " num: " << points.at(i).n << std::endl;
+        std::cout << "point: " << points.at(i).p.x << "," << points.at(i).p.y << " num: " << points.at(i).n << std::endl;
     }
-    std::cout << "\n\n";
+    std::cout << "\n";
 }

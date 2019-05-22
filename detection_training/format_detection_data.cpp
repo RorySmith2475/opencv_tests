@@ -54,7 +54,7 @@ int main(int argc, char** argv)
 
         image = cv::imread(file_names_neg[i]);
 
-        if(!image.empty()/* && image.cols > min_w && image.rows > min_h*/) {
+        if(!image.empty()) {
 
             cv::cvtColor(image, image, cv::COLOR_BGR2GRAY);
 

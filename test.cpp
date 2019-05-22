@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <iostream>
 
-using namespace cv;
+//using namespace cv;
 
 int main(int argc, char** argv)
 {
@@ -13,26 +13,26 @@ int main(int argc, char** argv)
     int ratio = 2;
     int kernel_size = 3;
 
-    Mat edges;
-    Mat color_iso;
+    cv::Mat edges;
+    cv::Mat color_iso;
 
-    VideoCapture src(0);
+    cv::VideoCapture src(0);
     if(!src.isOpened()) return -1;
 
-    Mat frame;
+    cv::Mat frame;
     while(src.read(frame)) {
         //src >> frame;
-        imshow("frame", frame);
+        cv::imshow("frame", frame);
 
-        cvtColor(frame, edges, COLOR_BGR2GRAY);
-        blur(edges, edges, Size(5,5));
-        Canny(edges, edges, threshold, threshold*ratio, kernel_size);
-        imshow("edges", edges);
+        cv::cvtColor(frame, edges, cv::COLOR_BGR2GRAY);
+        cv::blur(edges, edges, cv::Size(5,5));
+        cv::Canny(edges, edges, threshold, threshold*ratio, kernel_size);
+        cv::imshow("edges", edges);
 
-        inRange(frame, Scalar(0, 0, 0), Scalar(35, 35, 255), color_iso);
-        imshow("color_iso", color_iso);
+        cv::inRange(frame, cv::Scalar(0, 0, 0), cv::Scalar(35, 35, 255), color_iso);
+        cv::imshow("color_iso", color_iso);
 
-        waitKey(30);
+        cv::waitKey(30);
     }
 
     src.release();
