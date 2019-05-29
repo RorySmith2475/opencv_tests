@@ -14,15 +14,19 @@ cv::Point find_point(std::vector<point_data> points);
 void add_point(std::vector<point_data> &points, cv::Point point, int radius);
 void remove_point(std::vector<point_data> &points);
 void print_points(std::vector<point_data> points);
+void distance_to_points(std::vector<point_data> points);
 
 
 int main(int argc, char** argv)
 {
     cv::Mat frame;
+    
     std::vector<point_data> points;
     int radius = 100;
     int wait_time = 20;
     int reset_time = 120;
+    double focalLength = 1000;
+    double face_width = 5.5;
 
     cv::VideoCapture src(0);
     if(!src.isOpened()) return -1;
@@ -33,8 +37,10 @@ int main(int argc, char** argv)
     // Starts timer
     auto start = std::chrono::steady_clock::now();
     while(src.read(frame))
-    {
+    {   
+
         cv::Mat frame_gray;
+  
         cv::cvtColor(frame, frame_gray, cv::COLOR_BGR2GRAY);
         cv::equalizeHist(frame_gray, frame_gray);
 
@@ -44,10 +50,15 @@ int main(int argc, char** argv)
 
         if(!object.empty()) {
             cv::Point curr_point(object[0].x + object[0].width/2, object[0].y + object[0].height/2);
-            add_point(points, curr_point, radius);
 
+            add_point(points, curr_point, radius);
+            int distance = (face_width*focalLength)/object[0].width;
+            std::cout << "Distance: " << distance << "\n" << std::endl;
             cv::Point best_point = find_point(points);
-            if(best_point.x) cv::circle(frame, best_point, 50, cv::Scalar(255,255,255), 2, 8, 0);
+            if(best_point.x){
+                 cv::circle(frame, best_point, 50, cv::Scalar(255,255,255), 2, 8, 0);
+                 //cv::putText(frame, "Distance: " + distance,best_point,cv::FONT_HERSHEY_SIMPLEX,1,cv::Scalar(255,255,255),1,8,true);
+            }
         } 
         else std::cout << "-----------------------------------------------" << std::endl;
 
@@ -56,8 +67,7 @@ int main(int argc, char** argv)
                remove_point(points);
                start = std::chrono::steady_clock::now();
            }
-
-        if(points.size()) print_points(points);
+        if(points.size())print_points(points);
         cv::imshow("Window", frame);
         cv::waitKey(wait_time);
     }
@@ -130,4 +140,21 @@ void print_points(std::vector<point_data> points)
         std::cout << "point: " << points.at(i).p.x << "," << points.at(i).p.y << " num: " << points.at(i).n << std::endl;
     }
     std::cout << "\n";
+}
+
+
+/**
+ * Function takes in two consecutive frames and find distance using an optical flow method 
+*/
+void distance_to_points(std::vector<point_data> points)
+{
+    for (int i = 0; i < points.size(); i++){
+        if (points.at(i).n > 2 && i < points.size() -1){
+            int dx = std::abs(points.at(i+1).p.x - points.at(i).p.x);
+            int dy = std::abs(points.at(i+1).p.y - points.at(i).p.y);
+            std::cout << "Distance x: " << dx << "Distance y" << dy << "\n" << std::endl;
+
+        }
+        else{break;}
+    }
 }
