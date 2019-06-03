@@ -14,7 +14,7 @@ cv::Point find_point(std::vector<point_data> points);
 void add_point(std::vector<point_data> &points, cv::Point point, int radius);
 void remove_point(std::vector<point_data> &points);
 void print_points(std::vector<point_data> points);
-void direction_to_object(int x, int y, int z);
+void direction_to_object(int x, int y, int center_x, int center_Y);
 
 
 int main(int argc, char** argv)
@@ -59,7 +59,7 @@ int main(int argc, char** argv)
                  //Subtract half rows and cols to center axis.
                  int distance_x = (object[0].width/best_point.x) * face_width;
                  int distance_y = (object[0].width/best_point.y) * face_width;
-                 direction_to_object(best_point.x - frame_gray.cols/2, best_point.y - frame.rows/2, distance);
+                 direction_to_object(best_point.x, best_point.y, frame.cols/2, frame.rows/2);
             }
         } 
         else std::cout << "-----------------------------------------------" << std::endl;
@@ -148,10 +148,34 @@ void print_points(std::vector<point_data> points)
 /**
  * Function takes in two consecutive frames and find distance using an optical flow method 
 */
-void direction_to_object(int x, int y, int z)
-{       
+void direction_to_object(int x, int y, int center_x, int center_y)
+{      int accuracy = 20; //Change depending how accurate to center we want
+       if (x >= center_x + accuracy ){
+           std::cout << "Rotate Right" << std::endl;
+       }
+       else if (x < center_x - accuracy ){
+           std::cout << "Rotate Left" << std::endl;
+       }
+       else{
+           std::cout << "X is in center" << std::endl;
+       }
+       if (y >= center_y + accuracy ){
+           std::cout << "Rotate Down" << std::endl;
+       }
+       else if (y< center_y - accuracy ){
+           std::cout << "Rotate Up" << std::endl;
+       }
+       else{
+           std::cout << "Y is in center" << std::endl;
+       }
+
+
+       
+       
+       /* TRying to do angles
         double angle_x = atan(x/z) * 180/M_PI;
         double angle_y = atan(y/sqrt(x*x + z*z)) * 180/M_PI;
         std::cout << "Angle x: " << angle_x  << " Angle y: " << angle_y << "\n" << std::endl;
+        */
 
 }
